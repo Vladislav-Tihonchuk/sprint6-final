@@ -16,6 +16,8 @@ type Server struct {
 	server *http.Server
 }
 
+//
+
 func NewRouter(
 	logger *log.Logger,
 	addr string,
@@ -41,6 +43,7 @@ func NewRouter(
 		logger: logger,
 	}
 }
+
 func (s *Server) Start() error {
 	s.logger.Printf("Starting server on %s\n", s.server.Addr)
 	return s.server.ListenAndServe()
