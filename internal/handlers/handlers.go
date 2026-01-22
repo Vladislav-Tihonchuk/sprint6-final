@@ -42,7 +42,7 @@ func (h *Handler) HandleUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error reading file", http.StatusBadRequest)
 		return
 	}
-	defer file.Close() // Обязательно закрыть файл после его использования
+	defer file.Close()
 
 	input, err := io.ReadAll(file)
 	if err != nil {
@@ -50,7 +50,7 @@ func (h *Handler) HandleUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error reading file content", http.StatusInternalServerError)
 		return
 	}
-
+	//
 	result, err := h.service.ConvertString(string(input))
 	if err != nil {
 		h.logger.Printf("Error converting string: %v", err)
