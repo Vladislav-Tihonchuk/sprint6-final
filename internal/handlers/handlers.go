@@ -24,12 +24,12 @@ func New(logger *log.Logger, service service) *Handler {
 }
 
 func (h *Handler) HandleRoot(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8") // Устанавливаем правильный Content-Type
-	filepath := filepath.Join("..", "index.html")              // Убедись, что путь правильный
+	filepath := filepath.Join("../index.html")
 	http.ServeFile(w, r, filepath)
 }
 
 func (h *Handler) HandleUpload(w http.ResponseWriter, r *http.Request) {
+
 	if err := r.ParseMultipartForm(10000000000); err != nil {
 		h.logger.Printf("Error parsing form: %v", err)
 		http.Error(w, "Error parsing form", http.StatusBadRequest)
@@ -42,7 +42,7 @@ func (h *Handler) HandleUpload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error reading file", http.StatusBadRequest)
 		return
 	}
-	defer file.Close() // Обязательно закрыть файл после его использования
+	defer file.Close()
 
 	input, err := io.ReadAll(file)
 	if err != nil {
