@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"io"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -28,18 +29,35 @@ func (h *Handler) HandleRoot(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleUpload(w http.ResponseWriter, r *http.Request) {
+
 	if err := r.ParseMultipartForm(10000000000); err != nil {
 		h.logger.Printf("Error parsing form: %v", err)
 		http.Error(w, "Error parsing form", http.StatusBadRequest)
 		return
 	}
-	input := r.MultipartForm.File["myFile"][0]
-	result, err := h.service.ConvertString(input)
+
+	file, _, err := r.FormFile("myFile")
 	if err != nil {
-		h.logger.Printf("Error parsing form: %v", err)
-		http.Error(w, "Error parsing form", http.StatusBadRequest)
+		h.logger.Printf("Error reading file: %v", err)
+		http.Error(w, "Error reading file", http.StatusBadRequest)
 		return
 	}
-	w.Header().Set("Content-Type", "test/html")
+	defer file.Close() // Обязательно закрыть файл после его использования
+
+	input, err := io.ReadAll(file)
+	if err != nil {
+		h.logger.Printf("Error reading file content: %v", err)
+		http.Error(w, "Error reading file content", http.StatusInternalServerError)
+		return
+	}
+
+	result, err := h.service.ConvertString(string(input))
+	if err != nil {
+		h.logger.Printf("Error converting string: %v", err)
+		http.Error(w, "Error converting string", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Write([]byte(result))
 }
