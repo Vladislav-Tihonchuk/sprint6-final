@@ -4,7 +4,8 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"path/filepath"
+	"os"
+	"time"
 )
 
 type service interface {
@@ -28,16 +29,17 @@ func (h *Handler) HandleRoot(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-
-	filepath := filepath.Join("..", "index.html")
-
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	http.ServeFile(w, r, filepath)
+	http.ServeFile(w, r, "index.html")
 }
 
 func (h *Handler) HandleUpload(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
-	if err := r.ParseMultipartForm(10000000000); err != nil {
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		h.logger.Printf("Error parsing form: %v", err)
 		http.Error(w, "Error parsing form", http.StatusBadRequest)
 		return
@@ -65,6 +67,11 @@ func (h *Handler) HandleUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	filename := "result_" + time.Now().Format("20060102_150405") + ".txt"
+	if err := os.WriteFile(filename, []byte(result), 0644); err != nil {
+		h.logger.Printf("Error saving result file: %v", err)
+
+	}
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	w.Write([]byte(result))
 }
