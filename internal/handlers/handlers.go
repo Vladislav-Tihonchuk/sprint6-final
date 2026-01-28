@@ -24,7 +24,14 @@ func New(logger *log.Logger, service service) *Handler {
 }
 
 func (h *Handler) HandleRoot(w http.ResponseWriter, r *http.Request) {
-	filepath := filepath.Join("../index.html")
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+
+	filepath := filepath.Join("..", "index.html")
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	http.ServeFile(w, r, filepath)
 }
 

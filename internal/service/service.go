@@ -38,7 +38,8 @@ func (s *Service) ConvertString(input string) (string, error) {
 		text := s.converter.ToText(upperInput)
 
 		// Записываем в файл
-		os.WriteFile(time.Now().String()+".txt", []byte(text), 0644)
+		fileName := "morse_to_text_" + time.Now().Format("20060102_150405") + ".txt"
+		os.WriteFile(fileName, []byte(text), 0644)
 
 		return text, nil
 	} else {
@@ -46,7 +47,8 @@ func (s *Service) ConvertString(input string) (string, error) {
 		morseCode := s.converter.ToMorse(upperInput)
 
 		// Записываем в файл
-		os.WriteFile(time.Now().String()+".txt", []byte(morseCode), 0644)
+		fileName := "text_to_morse_" + time.Now().Format("20060102_150405") + ".txt"
+		os.WriteFile(fileName, []byte(morseCode), 0644)
 
 		return morseCode, nil
 	}
